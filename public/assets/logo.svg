@@ -1,0 +1,9 @@
+<svg width="250" height="60" viewBox="0 0 250 60" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Ahmadiyya Muslim Jamaat Logo">
+  <rect width="250" height="60" rx="8" fill="#000" />
+  <circle cx="35" cy="30" r="20" fill="#fff" />
+  <rect x="28" y="18" width="14" height="24" rx="2" fill="#000" />
+  <rect x="32" y="14" width="6" height="4" fill="#000" />
+  <text x="70" y="36" font-family="'Inter', Arial" font-size="16" fill="#fff">
+    Ahmadiyya Muslim Jamaat
+  </text>
+</svg>
