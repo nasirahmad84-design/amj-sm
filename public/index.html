@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AMJ Social Media Workshops</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="logo">
+        <img src="./assets/logo.svg" alt="Ahmadiyya Muslim Jamaat" />
+      </div>
+      <nav>
+        <a href="#workshops">Workshops</a>
+        <a href="#about">Über uns</a>
+        <a href="#contact">Kontakt</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="hero" aria-label="Workshop Highlights">
+        <div class="slider" data-slider>
+          <article class="slide active" data-workshop="Videoproduktion">
+            <div class="slide-media slide-video"></div>
+            <div class="slide-content">
+              <p class="eyebrow">Intensivtraining</p>
+              <h1>Videoproduktion mit Wirkung</h1>
+              <p>
+                Von der Idee bis zur Veröffentlichung: Wir zeigen, wie moderne
+                Da'wa-Videos Emotionen wecken und Zielgruppen erreichen.
+              </p>
+              <button class="cta" data-scroll-target="#workshops">Jetzt entdecken</button>
+            </div>
+          </article>
+          <article class="slide" data-workshop="Islam & Social Media">
+            <div class="slide-media slide-islam"></div>
+            <div class="slide-content">
+              <p class="eyebrow">Strategie</p>
+              <h1>Islam & Social Media</h1>
+              <p>
+                Ethik, Sicherheit und Chancen: Wir verbinden islamische Werte mit
+                digitaler Kommunikationskompetenz für ehrenamtliche Teams.
+              </p>
+              <button class="cta" data-scroll-target="#workshops">Jetzt entdecken</button>
+            </div>
+          </article>
+          <article class="slide" data-workshop="Storytelling & Narrativaufbau">
+            <div class="slide-media slide-story"></div>
+            <div class="slide-content">
+              <p class="eyebrow">Content Lab</p>
+              <h1>Storytelling & Narrativaufbau</h1>
+              <p>
+                Erzähle Geschichten, die Brücken bauen: Wir üben Narrative, die
+                islamische Identität, Nahbarkeit und gesellschaftlichen Nutzen verbinden.
+              </p>
+              <button class="cta" data-scroll-target="#workshops">Jetzt entdecken</button>
+            </div>
+          </article>
+        </div>
+        <div class="slider-dots" data-slider-dots></div>
+      </section>
+
+      <section id="workshops" class="workshop-section">
+        <div class="section-header">
+          <p class="eyebrow">Unser Angebot</p>
+          <h2>Workshops für Social-Media-Teams der Ahmadiyya Muslim Jamaat</h2>
+        </div>
+        <div class="workshop-grid">
+          <article class="workshop-card">
+            <img src="./assets/video-workshop.svg" alt="Videoproduktion" />
+            <div>
+              <h3>Videoproduktion</h3>
+              <p>
+                Hands-on Training für Aufbau, Dreh und Schnitt von Kurzformaten. Wir
+                kombinieren Storyboards, Lichtführung und mobile Produktion, damit jede
+                Jamaat professionelle Clips veröffentlichen kann.
+              </p>
+              <button class="ghost" data-prefill="Videoproduktion">Zur Anmeldung</button>
+            </div>
+          </article>
+          <article class="workshop-card">
+            <img src="./assets/islam-social.svg" alt="Islam und Social Media" />
+            <div>
+              <h3>Islam & Social Media</h3>
+              <p>
+                Richtlinien für verantwortungsvolle Kommunikation, Community-Management
+                und Reaktionspläne auf kritische Kommentare. Fokus: Schutz von Team und
+                Botschaft bei hoher Reichweite.
+              </p>
+              <button class="ghost" data-prefill="Islam & Social Media">Zur Anmeldung</button>
+            </div>
+          </article>
+          <article class="workshop-card">
+            <img src="./assets/storytelling.svg" alt="Storytelling" />
+            <div>
+              <h3>Storytelling & Narrativaufbau</h3>
+              <p>
+                Narrative entwickeln, die Menschen berühren: Von Hook über Dramaturgie
+                bis Call-to-Action entwerfen wir Serien, die Glauben, Dienst und Dialog
+                sichtbar machen.
+              </p>
+              <button class="ghost" data-prefill="Storytelling & Narrativaufbau">Zur Anmeldung</button>
+            </div>
+          </article>
+        </div>
+      </section>
+
+      <section id="about" class="about-section">
+        <div class="section-header">
+          <p class="eyebrow">Über uns</p>
+          <h2>Digitale Kompetenz aus der Jamaat für die Jamaat</h2>
+        </div>
+        <p>
+          Die Ahmadiyya Muslim Jamaat Deutschland unterstützt lokale Gemeinden mit
+          erprobten Social-Media-Methoden. Unsere Trainer:innen bringen Erfahrung aus
+          bundesweiten Kampagnen, ehrenamtlichen Media-Teams und professionellen Content-
+          Studios mit. Jeder Workshop kombiniert Glaubenswerte, Praxisübungen und
+          individuelle Beratung.
+        </p>
+      </section>
+
+      <section id="contact" class="form-section" aria-labelledby="contact-title">
+        <div class="section-header">
+          <p class="eyebrow">Anmeldung</p>
+          <h2 id="contact-title">Jetzt Workshop anfragen</h2>
+          <p>
+            Wählen Sie einen Workshop, beantworten Sie die Zusatzfragen und wir melden
+            uns mit Terminen, Ressourcen und Zugangsdaten.
+          </p>
+        </div>
+        <form id="registration-form">
+          <label>
+            Gewünschter Workshop*
+            <select name="workshop" id="workshop-select" required>
+              <option value="">Bitte wählen</option>
+              <option value="Videoproduktion">Videoproduktion</option>
+              <option value="Islam & Social Media">Islam & Social Media</option>
+              <option value="Storytelling & Narrativaufbau">Storytelling & Narrativaufbau</option>
+            </select>
+          </label>
+          <div class="form-row">
+            <label>
+              Vollständiger Name*
+              <input type="text" name="fullName" required />
+            </label>
+            <label>
+              E-Mail*
+              <input type="email" name="email" required />
+            </label>
+          </div>
+          <div class="form-row">
+            <label>
+              Telefon
+              <input type="tel" name="phone" placeholder="+49..." />
+            </label>
+            <label>
+              Jamaat / Organisation
+              <input type="text" name="organization" />
+            </label>
+          </div>
+          <div id="dynamic-fields" class="dynamic-fields"></div>
+          <button type="submit" class="cta">Anfrage senden</button>
+          <p class="form-feedback" role="status" aria-live="polite"></p>
+        </form>
+      </section>
+    </main>
+
+    <footer class="site-footer">
+      <p>© <span id="year"></span> Ahmadiyya Muslim Jamaat Deutschland – Social Media Team</p>
+      <a href="mailto:press@ahmadiyya.de">press@ahmadiyya.de</a>
+    </footer>
+
+    <script src="./app.js" defer></script>
+  </body>
+</html>

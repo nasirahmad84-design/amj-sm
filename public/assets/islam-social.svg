@@ -1,0 +1,12 @@
+<svg width="400" height="260" viewBox="0 0 400 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Islam und Social Media Illustration">
+  <defs>
+    <linearGradient id="gradIslam" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f9b0f" />
+      <stop offset="100%" stop-color="#57d28b" />
+    </linearGradient>
+  </defs>
+  <rect width="400" height="260" rx="24" fill="url(#gradIslam)" />
+  <circle cx="200" cy="120" r="70" fill="rgba(255,255,255,0.15)" />
+  <path d="M200 75 L220 125 L180 125 Z" fill="#fff" opacity="0.9" />
+  <rect x="120" y="150" width="160" height="8" rx="4" fill="#fff" opacity="0.8" />
+</svg>
