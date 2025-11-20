@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gebetstracker für AMJ Nidda</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="top-bar">
+      <div class="title-group">
+        <div class="pill">Moschee Nidda</div>
+        <h1>Gebetstracker für AMJ Nidda</h1>
+        <p class="subtitle">Behalte Gebetszeiten und Besucherzahlen der Altersgruppen im Blick.</p>
+      </div>
+      <div class="meta-group">
+        <div class="time-now" id="timeNow">--:--</div>
+        <div class="current-prayer" id="currentPrayer">Aktuelles Gebet wird geladen …</div>
+      </div>
+    </header>
+
+    <nav class="tabs" role="tablist">
+      <button class="tab active" data-tab="tracker" aria-selected="true">Startseite</button>
+      <button class="tab" data-tab="dashboard" aria-selected="false">Dashboard</button>
+    </nav>
+
+    <main>
+      <section class="tab-panel active" id="tab-tracker" role="tabpanel">
+        <div class="grid two-cols">
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Altersgruppen</p>
+                <h2>Wähle eine Gruppe</h2>
+                <p class="hint">Atfal, Khuddam oder Ansar wählen, um Besucher hinzuzufügen.</p>
+              </div>
+              <div class="badge" id="selectedGroup">Keine Auswahl</div>
+            </div>
+            <div class="group-selector" id="groupSelector">
+              <button class="group-card" data-group="Atfal">
+                <span>Atfal</span>
+                <small>Jugendliche unter 15 Jahren</small>
+              </button>
+              <button class="group-card" data-group="Khuddam">
+                <span>Khuddam</span>
+                <small>Junge Erwachsene</small>
+              </button>
+              <button class="group-card" data-group="Ansar">
+                <span>Ansar</span>
+                <small>Erfahrene Mitglieder</small>
+              </button>
+            </div>
+            <div class="panel-footer note">
+              Tipp: Die ausgewählte Gruppe bleibt aktiv, bis du sie wechselst.
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-header">
+              <div>
+                <p class="eyebrow">Gebetszeiten</p>
+                <h2>Besucher erfassen</h2>
+                <p class="hint">Zeit auswählen, Anzahl eintragen und speichern.</p>
+              </div>
+            </div>
+            <div class="prayer-grid" id="prayerGrid">
+              <!-- Cards via JS -->
+            </div>
+            <form class="entry-form" id="entryForm">
+              <div class="form-row">
+                <label for="prayerSelect">Gebet</label>
+                <select id="prayerSelect"></select>
+              </div>
+              <div class="form-row">
+                <label for="countInput">Anzahl Besucher</label>
+                <input type="number" id="countInput" min="1" placeholder="z. B. 12" required />
+              </div>
+              <button type="submit" class="primary">Eintrag speichern</button>
+              <p class="form-help">Einträge werden lokal gespeichert und fließen direkt in die Statistik.</p>
+            </form>
+          </div>
+        </div>
+
+        <div class="panel entries-panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Heutige Einträge</p>
+              <h2>Letzte Besucherzahlen</h2>
+            </div>
+            <button class="ghost" id="clearEntries">Heutige Einträge zurücksetzen</button>
+          </div>
+          <ul class="entry-list" id="entryList"></ul>
+        </div>
+      </section>
+
+      <section class="tab-panel" id="tab-dashboard" role="tabpanel">
+        <div class="panel">
+          <div class="panel-header">
+            <div>
+              <p class="eyebrow">Übersicht</p>
+              <h2>Statistik nach Zeitraum</h2>
+              <p class="hint">Zeige Besucher pro Gebet für einen Tag, eine Woche oder einen Monat.</p>
+            </div>
+            <div class="controls">
+              <select id="rangeSelect">
+                <option value="day">Tag</option>
+                <option value="week">Woche</option>
+                <option value="month">Monat</option>
+              </select>
+              <input type="date" id="referenceDate" />
+              <button class="secondary" id="exportPdf">Als PDF exportieren</button>
+            </div>
+          </div>
+
+          <div class="stats-summary" id="statsSummary">
+            <!-- Cards via JS -->
+          </div>
+
+          <div class="panel-footer note">
+            Der Zeitraum richtet sich nach dem ausgewählten Datum. Wochen starten am Montag.
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" integrity="sha512-/FJZjYPdtcOk6TnC7YI5pGHCqElcK+cG10AUqZSdfONqGAqhZ3p0N6zGyF/F7kh/3Gzdh0dX8GZFODdgNpTi7w==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="script.js"></script>
+</body>
+</html>
