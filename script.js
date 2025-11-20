@@ -1,13 +1,5 @@
-const prayers = [
-  { id: 'fajr', name: 'Fajr', time: '06:30', label: 'Morgen' },
-  { id: 'zohr', name: 'Zohr', time: '13:30', label: 'Mittag' },
-  { id: 'assr', name: 'Assr', time: '13:30', label: 'Nachmittag' },
-  { id: 'maghrib', name: 'Maghrib', time: '16:50', label: 'Abend' },
-  { id: 'isha', name: 'Isha', time: '19:00', label: 'Nacht' },
-  { id: 'jumma', name: 'Jumma', time: '13:15', label: 'Freitag' }
-];
-
-const groups = ['Atfal', 'Khuddam', 'Ansar'];
+const prayers = window.AMJTracker?.prayers ?? [];
+const groups = window.AMJTracker?.groups ?? [];
 
 const els = {
   timeNow: document.getElementById('timeNow'),
@@ -28,37 +20,25 @@ const els = {
   exportPdf: document.getElementById('exportPdf')
 };
 
-const STORAGE_KEY = 'amj-prayer-entries-v1';
 let selectedGroup = null;
+let entriesToday = [];
+let summaryData = {};
+let rangeLabel = '';
 
 function getTodayISO(date = new Date()) {
   return date.toISOString().split('T')[0];
 }
 
-function loadEntries() {
-  try {
-    const data = JSON.parse(localStorage.getItem(STORAGE_KEY));
-    return Array.isArray(data) ? data : [];
-  } catch (e) {
-    return [];
-  }
-}
-
-function saveEntries(entries) {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(entries));
-}
-
-let entries = loadEntries();
-
 function setActiveGroup(group) {
   selectedGroup = group;
   els.selectedGroup.textContent = group ? `Ausgewählt: ${group}` : 'Keine Auswahl';
-  els.groupSelector.querySelectorAll('.group-card').forEach((btn) => {
+  els.groupSelector?.querySelectorAll('.group-card').forEach((btn) => {
     btn.classList.toggle('active', btn.dataset.group === group);
   });
 }
 
 function renderPrayerCards() {
+  if (!els.prayerGrid) return;
   els.prayerGrid.innerHTML = '';
   prayers.forEach((prayer) => {
     const card = document.createElement('div');
@@ -75,6 +55,7 @@ function renderPrayerCards() {
 }
 
 function populatePrayerSelect() {
+  if (!els.prayerSelect) return;
   els.prayerSelect.innerHTML = prayers
     .map((p) => `<option value="${p.id}">${p.name} (${p.time} Uhr)</option>`)
     .join('');
@@ -112,18 +93,21 @@ function determineCurrentPrayer() {
 }
 
 function updateClock() {
+  if (!els.timeNow || !els.currentPrayer) return;
   const now = new Date();
   els.timeNow.textContent = formatTime(now);
   const current = determineCurrentPrayer();
-  els.currentPrayer.textContent = `Aktuelles Gebet: ${current.name} um ${current.time} Uhr`;
-  highlightCurrentPrayer(current.id);
+  if (current) {
+    els.currentPrayer.textContent = `Aktuelles Gebet: ${current.name} um ${current.time} Uhr`;
+    highlightCurrentPrayer(current.id);
+  }
 }
 
 function highlightCurrentPrayer(currentId) {
   document.querySelectorAll('.prayer-card').forEach((card) => {
     card.classList.toggle('highlight', card.dataset.prayer === currentId);
   });
-  Array.from(els.prayerSelect.options).forEach((opt) => {
+  Array.from(els.prayerSelect?.options ?? []).forEach((opt) => {
     if (opt.value === currentId) {
       els.prayerSelect.value = currentId;
     }
@@ -131,45 +115,34 @@ function highlightCurrentPrayer(currentId) {
 }
 
 function renderEntries() {
-  const today = getTodayISO();
-  const todaysEntries = entries.filter((e) => e.date === today);
+  if (!els.entryList) return;
   els.entryList.innerHTML = '';
 
-  if (!todaysEntries.length) {
+  if (!entriesToday.length) {
     els.entryList.innerHTML = '<li class="empty">Noch keine Einträge für heute.</li>';
     return;
   }
 
-  todaysEntries
-    .slice()
-    .reverse()
-    .forEach((entry) => {
-      const li = document.createElement('li');
-      li.className = 'entry-card';
-      const prayer = prayers.find((p) => p.id === entry.prayerId);
-      li.innerHTML = `
-        <div class="entry-meta">
-          <span class="dot"></span>
-          <div>
-            <div class="title">${entry.count} Besucher · ${prayer?.name ?? entry.prayerId}</div>
-            <div class="sub">${entry.group} · ${entry.time}</div>
-          </div>
+  entriesToday.forEach((entry) => {
+    const li = document.createElement('li');
+    li.className = 'entry-card';
+    const prayer = prayers.find((p) => p.id === entry.prayer);
+    li.innerHTML = `
+      <div class="entry-meta">
+        <span class="dot"></span>
+        <div>
+          <div class="title">${entry.attendees} Besucher · ${prayer?.name ?? entry.prayer}</div>
+          <div class="sub">${entry.age_group} · ${entry.entry_time ?? ''}</div>
         </div>
-        <span class="sub">${entry.date}</span>
-      `;
-      els.entryList.appendChild(li);
-    });
-}
-
-function addEntry(data) {
-  entries.push(data);
-  saveEntries(entries);
-  renderEntries();
-  updateStats();
+      </div>
+      <span class="sub">${entry.entry_date}</span>
+    `;
+    els.entryList.appendChild(li);
+  });
 }
 
 function attachGroupHandlers() {
-  els.groupSelector.addEventListener('click', (e) => {
+  els.groupSelector?.addEventListener('click', (e) => {
     const button = e.target.closest('button[data-group]');
     if (!button) return;
     setActiveGroup(button.dataset.group);
@@ -187,25 +160,21 @@ function handleEntrySubmit(e) {
   if (!count || count < 1) return;
 
   const now = new Date();
-  addEntry({
+  const payload = {
     prayerId,
-    group: selectedGroup,
+    ageGroup: selectedGroup,
     count,
-    time: formatTime(now),
-    date: getTodayISO(now),
-    timestamp: now.toISOString()
-  });
+    entryDate: getTodayISO(now)
+  };
+  saveEntry(payload);
   els.countInput.value = '';
 }
 
 function attachFormHandlers() {
-  els.entryForm.addEventListener('submit', handleEntrySubmit);
-  els.clearEntries.addEventListener('click', () => {
-    const today = getTodayISO();
-    entries = entries.filter((e) => e.date !== today);
-    saveEntries(entries);
-    renderEntries();
-    updateStats();
+  els.entryForm?.addEventListener('submit', handleEntrySubmit);
+  els.clearEntries?.addEventListener('click', () => {
+    if (!confirm('Sollen die heutigen Einträge wirklich entfernt werden?')) return;
+    deleteTodayEntries();
   });
 }
 
@@ -222,7 +191,9 @@ function attachTabHandlers() {
 }
 
 function setDefaultDate() {
-  els.referenceDate.value = getTodayISO();
+  if (els.referenceDate) {
+    els.referenceDate.value = getTodayISO();
+  }
 }
 
 function getRangeBounds(reference, mode) {
@@ -239,7 +210,7 @@ function getRangeBounds(reference, mode) {
 
   if (mode === 'week') {
     const day = date.getDay();
-    const diff = (day === 0 ? -6 : 1 - day); // Monday as first day
+    const diff = day === 0 ? -6 : 1 - day;
     const start = new Date(date);
     start.setDate(date.getDate() + diff);
     start.setHours(0, 0, 0, 0);
@@ -260,90 +231,55 @@ function getRangeBounds(reference, mode) {
   return null;
 }
 
-function filterEntriesByRange(range) {
-  if (!range) return [];
-  return entries.filter((entry) => {
-    const ts = new Date(entry.timestamp).getTime();
-    return ts >= range.start.getTime() && ts <= range.end.getTime();
-  });
-}
-
-function summarizeByPrayer(range) {
-  const filtered = filterEntriesByRange(range);
-  const summary = prayers.reduce((acc, prayer) => {
-    acc[prayer.id] = { total: 0, groups: {} };
-    groups.forEach((g) => (acc[prayer.id].groups[g] = 0));
-    return acc;
-  }, {});
-
-  filtered.forEach((entry) => {
-    const bucket = summary[entry.prayerId];
-    if (bucket) {
-      bucket.total += entry.count;
-      bucket.groups[entry.group] += entry.count;
-    }
-  });
-
-  return summary;
-}
-
 function renderStats() {
-  const rangeMode = els.rangeSelect.value;
-  const range = getRangeBounds(els.referenceDate.value, rangeMode);
-  if (!range) return;
-  const summary = summarizeByPrayer(range);
+  const rangeMode = els.rangeSelect?.value;
+  const range = getRangeBounds(els.referenceDate?.value, rangeMode);
+  if (!range || !els.statsSummary) return;
   els.statsSummary.innerHTML = '';
 
   prayers.forEach((prayer) => {
-    const info = summary[prayer.id];
-    const detail = groups
-      .map((g) => `${g}: ${info.groups[g]} Besucher`)
-      .join(' · ');
+    const info = summaryData[prayer.id] ?? { total: 0, groups: {} };
+    const detail = groups.map((g) => `${g}: ${info.groups?.[g] ?? 0} Besucher`).join(' · ');
     const card = document.createElement('div');
     card.className = 'stat-card';
     card.innerHTML = `
       <h3>${prayer.name}</h3>
-      <div class="total">${info.total}</div>
+      <div class="total">${info.total ?? 0}</div>
       <div class="detail">${detail}</div>
-      <div class="detail">Zeitraum: ${range.label}</div>
+      <div class="detail">Zeitraum: ${rangeLabel || range.label}</div>
     `;
     els.statsSummary.appendChild(card);
   });
 }
 
-function updateStats() {
-  renderStats();
-}
-
 function attachDashboardHandlers() {
-  els.rangeSelect.addEventListener('change', renderStats);
-  els.referenceDate.addEventListener('change', renderStats);
-  els.exportPdf.addEventListener('click', exportStatsToPDF);
+  els.rangeSelect?.addEventListener('change', refreshData);
+  els.referenceDate?.addEventListener('change', refreshData);
+  els.exportPdf?.addEventListener('click', exportStatsToPDF);
 }
 
 function exportStatsToPDF() {
-  const rangeMode = els.rangeSelect.value;
-  const range = getRangeBounds(els.referenceDate.value, rangeMode);
-  if (!range) return;
+  const rangeMode = els.rangeSelect?.value;
+  const range = getRangeBounds(els.referenceDate?.value, rangeMode);
+  if (!range || !window.jspdf) return;
 
-  const summary = summarizeByPrayer(range);
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
   doc.setFont('helvetica', 'bold');
   doc.text('Gebetstracker AMJ Nidda – Statistik', 14, 18);
   doc.setFont('helvetica', 'normal');
-  doc.text(`Zeitraum: ${range.label} (${rangeMode})`, 14, 26);
+  doc.text(`Zeitraum: ${rangeLabel || range.label} (${rangeMode})`, 14, 26);
   doc.text(`Exportiert am ${new Date().toLocaleString('de-DE')}`, 14, 34);
 
   let y = 46;
   prayers.forEach((prayer) => {
-    const info = summary[prayer.id];
+    const info = summaryData[prayer.id] ?? { total: 0, groups: {} };
     doc.setFont('helvetica', 'bold');
     doc.text(prayer.name, 14, y);
     doc.setFont('helvetica', 'normal');
-    doc.text(`Gesamt: ${info.total} Besucher`, 14, y + 8);
+    doc.text(`Gesamt: ${info.total ?? 0} Besucher`, 14, y + 8);
     doc.text(
-      groups.map((g) => `${g}: ${info.groups[g]} Besucher`).join(' · '),
+      groups.map((g) => `${g}: ${info.groups?.[g] ?? 0} Besucher`).join(' · '),
       14,
       y + 16
     );
@@ -353,16 +289,88 @@ function exportStatsToPDF() {
   doc.save(`gebetstracker-statistik-${rangeMode}.pdf`);
 }
 
+async function saveEntry(payload) {
+  const body = new URLSearchParams({
+    action: 'amj_save_entry',
+    nonce: window.AMJTracker.nonce,
+    ...payload,
+  });
+
+  const res = await fetch(window.AMJTracker.ajaxUrl, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body,
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    alert(data.data?.message ?? 'Eintrag konnte nicht gespeichert werden.');
+    return;
+  }
+  await refreshData();
+}
+
+async function deleteTodayEntries() {
+  const today = getTodayISO();
+  const res = await fetch(window.AMJTracker.ajaxUrl, {
+    method: 'POST',
+    credentials: 'same-origin',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      action: 'amj_delete_today',
+      nonce: window.AMJTracker.nonce,
+      entryDate: today,
+    }),
+  });
+
+  const data = await res.json();
+  if (!data.success) {
+    alert(data.data?.message ?? 'Löschen nicht möglich.');
+    return;
+  }
+  await refreshData();
+}
+
+async function refreshData() {
+  const rangeMode = els.rangeSelect?.value || 'day';
+  const referenceDate = els.referenceDate?.value || getTodayISO();
+  const params = new URLSearchParams({
+    action: 'amj_get_entries',
+    nonce: window.AMJTracker.nonce,
+    range: rangeMode,
+    reference: referenceDate,
+  });
+
+  const res = await fetch(`${window.AMJTracker.ajaxUrl}?${params.toString()}`, {
+    credentials: 'same-origin',
+  });
+  const data = await res.json();
+  if (!data.success) {
+    console.error(data.data?.message || 'Fehler beim Laden der Einträge');
+    return;
+  }
+
+  entriesToday = data.data.todayEntries ?? [];
+  summaryData = data.data.summary ?? {};
+  rangeLabel = data.data.rangeLabel ?? '';
+  renderEntries();
+  renderStats();
+}
+
 function init() {
+  if (!window.AMJTracker) {
+    console.warn('AMJTracker Daten nicht gefunden.');
+    return;
+  }
   renderPrayerCards();
   populatePrayerSelect();
   attachGroupHandlers();
   attachFormHandlers();
   attachTabHandlers();
   attachDashboardHandlers();
-  renderEntries();
   setDefaultDate();
-  renderStats();
+  refreshData();
   updateClock();
   setInterval(updateClock, 1000 * 30);
 }
